@@ -9,4 +9,6 @@ import com.hospital.ABCHospital.entity.Patient;
 public interface PatientRepo extends CrudRepository<Patient, Integer> {
 
 	public Optional<Patient> findByFirstName(String firstName);
+
+	public Optional<Patient> findByFirstNameAndLastName(String firstName, String lastName);
 }

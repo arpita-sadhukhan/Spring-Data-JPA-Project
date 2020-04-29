@@ -18,9 +18,11 @@ public class Doctor {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
+	private String title;
 	private String firstName;
 	private String lastName;
 	private String speciality;
+	private long phoneNumber;
 
 	@OneToMany(mappedBy = "doctor")
 	private Set<Appointment> appointments;
@@ -34,6 +36,14 @@ public class Doctor {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getFirstName() {
@@ -60,6 +70,14 @@ public class Doctor {
 		this.speciality = speciality;
 	}
 
+	public long getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(long phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
 	public Set<Appointment> getAppointments() {
 		return appointments;
 	}
@@ -78,8 +96,9 @@ public class Doctor {
 
 	@Override
 	public String toString() {
-		return "Doctor [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", speciality=" + speciality
-				+ ", appointments=" + appointments + ", patients=" + patients + "]";
+		return "Doctor [id=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", speciality=" + speciality + ", phoneNumber=" + phoneNumber + "]";
 	}
+
 
 }

@@ -9,20 +9,24 @@ public class DoctorDTO {
 	private Integer id;
 	
 	@NotNull
+	@JsonProperty("Title")
+	private String title;
+	
+	@NotNull(message = "First Name must not be null")
 	@JsonProperty("FirstName")
 	private String firstName;
 	
-	@NotNull
 	@JsonProperty("LastName")
 	private String lastname;
 	
-	@NotNull
+	@NotNull(message = "Phone No nust not be null")
 	@JsonProperty("PhoneNumber")
-	private String phone;
+	private String phoneNumber;
 	
-	private String InsuranceProvider;
-	private double coverageLimit;
-
+	@NotNull(message = "Speciality must not be null")
+	@JsonProperty("Speciality")
+	private String speciality;
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -39,28 +43,28 @@ public class DoctorDTO {
 		this.lastname = lastname;
 	}
 
-	public String getPhone() {
-		return phone;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public String getInsuranceProvider() {
-		return InsuranceProvider;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 
-	public void setInsuranceProvider(String insuranceProvider) {
-		InsuranceProvider = insuranceProvider;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
-	public double getCoverageLimit() {
-		return coverageLimit;
+	public String getSpeciality() {
+		return speciality;
 	}
 
-	public void setCoverageLimit(double coverageLimit) {
-		this.coverageLimit = coverageLimit;
+	public void setSpeciality(String speciality) {
+		this.speciality = speciality;
 	}
 
 	public Integer getId() {
