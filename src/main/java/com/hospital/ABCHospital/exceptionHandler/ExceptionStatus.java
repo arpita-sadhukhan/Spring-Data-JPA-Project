@@ -5,7 +5,9 @@ public enum ExceptionStatus {
 	DUPLICATE_DOCTOR(1000, "Doctor is already Registered"),
 	DUPLICATE_PATIENT(1001, "Patient is already Registered"),
 	DUPLICATE_APPOINTMENT(1002, "An appointment of the Patient with the same doctor is already registered"),
-	INCOMPLETE_APPOINTMENT(1003, "Incomplete Request");
+	INCOMPLETE_APPOINTMENT(1003, "Incomplete Request"),
+	DOCTOR_UNREGISTERED(1004, "Requested Doctor is not Registered"),
+	PATIENT_UNREGISTERED(1004, "Requested Patient is not Registered"),;
 	
 	
 

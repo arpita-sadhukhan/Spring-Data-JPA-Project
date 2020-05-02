@@ -12,6 +12,12 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 	@JsonProperty("Appointment Time")
 	private String time;
 	
+	@NotNull(message = "Please provide appointment date")
+	@JsonProperty("Appointment date")
+	private String date;
+	
+	private int appointment_id;
+	
 	@JsonProperty("Reason")
 	private String reason;
 	
@@ -19,10 +25,12 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 	private boolean ended;
 	
 	@NotNull(message = "Please provide Patient Information")
-	private PatientDTO patientDto;
+	@JsonProperty("Patient Id")
+	private int patientId;
 	
 	@NotNull(message = "Please provide Doctor Information")
-	private DoctorDTO doctorDto;
+	@JsonProperty("Doctor Id")
+	private int doctorId;
 	
 	public String getTime() {
 		return time;
@@ -36,17 +44,18 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 	public void setReason(String reason) {
 		this.reason = reason;
 	}
-	public PatientDTO getPatientDto() {
-		return patientDto;
+
+	public int getPatientId() {
+		return patientId;
 	}
-	public void setPatientDto(PatientDTO patientDto) {
-		this.patientDto = patientDto;
+	public void setPatientId(int patientId) {
+		this.patientId = patientId;
 	}
-	public DoctorDTO getDoctorDto() {
-		return doctorDto;
+	public int getDoctorId() {
+		return doctorId;
 	}
-	public void setDoctorDto(DoctorDTO doctorDto) {
-		this.doctorDto = doctorDto;
+	public void setDoctorId(int doctorId) {
+		this.doctorId = doctorId;
 	}
 	public boolean isStarted() {
 		return started;
@@ -59,6 +68,18 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 	}
 	public void setEnded(boolean ended) {
 		this.ended = ended;
+	}
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	public int getAppointment_id() {
+		return appointment_id;
+	}
+	public void setAppointment_id(int appointment_id) {
+		this.appointment_id = appointment_id;
 	}
 	
 }

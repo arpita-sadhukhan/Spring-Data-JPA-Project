@@ -7,10 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.Dto.DoctorDTO;
 import com.hospital.ABCHospital.Dto.PatientDTO;
+import com.hospital.ABCHospital.service.AppointmentService;
 import com.hospital.ABCHospital.service.IRegistrationService;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -20,7 +23,7 @@ public class RegisterController {
 	
 	@Autowired
 	IRegistrationService service;
-
+	
 	@PostMapping("/doctor")
 	public ResponseEntity<DoctorDTO> registerDoctor(@RequestBody DoctorDTO doctorDto) {
 		

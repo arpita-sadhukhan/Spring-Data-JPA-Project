@@ -1,22 +1,32 @@
 package com.hospital.ABCHospital.service;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.omg.CORBA.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.Dto.DoctorDTO;
 import com.hospital.ABCHospital.Dto.PatientDTO;
+import com.hospital.ABCHospital.Utility.CommonUtility;
 import com.hospital.ABCHospital.entity.Appointment;
+import com.hospital.ABCHospital.entity.Doctor;
+import com.hospital.ABCHospital.entity.Patient;
 import com.hospital.ABCHospital.exception.DuplicateRecordException;
+import com.hospital.ABCHospital.exception.InvalidUserException;
 import com.hospital.ABCHospital.exceptionHandler.ExceptionStatus;
 import com.hospital.ABCHospital.repository.AppointmentRepo;
+import com.hospital.ABCHospital.repository.DoctorRepo;
+import com.hospital.ABCHospital.repository.PatientRepo;
 
 @Service
 public class AppointmentService implements IAppointmentService{
@@ -25,16 +35,19 @@ public class AppointmentService implements IAppointmentService{
 	AppointmentRepo repo;
 	
 	@Autowired
+	DoctorRepo docRepo;
+	
+	@Autowired
+	PatientRepo patientRepo;
+	
+	@Autowired
 	ModelMapper modelMapper;
 	
 	@Override
-	public AppointmentDTO createAppointment(AppointmentDTO appDto) {
+	public AppointmentDTO createAppointment(AppointmentDTO appDto) throws InvalidUserException {
 
-		PatientDTO patientDto = appDto.getPatientDto();
-		DoctorDTO doctorDto = appDto.getDoctorDto();
-		
-		if(patientDto != null && doctorDto != null) {
-			Optional<List<Appointment>> appointmentHistory = repo.findByPatientIdAndDoctorId(patientDto.getId(), doctorDto.getId());
+		if(appDto.getPatientId() > 0 && appDto.getDoctorId() > 0) {
+			Optional<List<Appointment>> appointmentHistory = repo.findByPatientIdAndDoctorId(appDto.getPatientId(), appDto.getDoctorId());
 			
 			if(appointmentHistory.isPresent()) {
 				
@@ -54,23 +67,44 @@ public class AppointmentService implements IAppointmentService{
 
 	private Long checkPastAppointment(AppointmentDTO appDto, Optional<List<Appointment>> appointmentHistory) {
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
-		LocalDate lDate = LocalDate.parse(appDto.getTime(),format);
+		LocalDate lDate = LocalDate.parse(appDto.getDate());
 		
 		Long noOfPastAppointments = appointmentHistory.get()
 						  .stream()
-						  .map(appointment -> appointment.getAppointmentTime().toLocalDateTime())
-						  .filter(date -> date.isAfter(lDate.minusDays(5).atStartOfDay()))
+						  .map(appointment -> appointment.getDateOfAppointment().toLocalDate())
+						  .filter(date -> date.isAfter(lDate.minusDays(5)))
 						  .collect(Collectors.counting());
 		return noOfPastAppointments;
 	}
 
-	private Appointment createNewAppointment(AppointmentDTO appDto) {
+	private Appointment createNewAppointment(AppointmentDTO appDto) throws InvalidUserException {
 
-		Appointment appointment = modelMapper.map(appDto, Appointment.class);
+		Appointment appointment = map(appDto);
 		appointment.setStarted(false);
 		appointment.setEnded(false);
 		
 		return repo.save(appointment);
+	}
+
+	private Appointment map(AppointmentDTO appDto) throws InvalidUserException {
+		
+		Appointment appointment = new Appointment();
+
+		Optional<Doctor> doctor = docRepo.findById(appDto.getDoctorId());
+		doctor.orElseThrow(() -> new InvalidUserException(ExceptionStatus.DOCTOR_UNREGISTERED.getStatusMessage()));
+		
+		appointment.setDoctor(doctor.get());
+		
+		Optional<Patient> patient = patientRepo.findById(appDto.getPatientId());
+		patient.orElseThrow(() -> new InvalidUserException(ExceptionStatus.PATIENT_UNREGISTERED.getStatusMessage()));
+		
+		appointment.setPatient(patient.get());
+		String time = appDto.getTime();
+		appointment.setAppointmentTime(Time.valueOf(time));
+		appointment.setDateOfAppointment(Date.valueOf(appDto.getDate()));
+		appointment.setReason(appDto.getReason());
+		
+		return appointment;
 	}
 
 }

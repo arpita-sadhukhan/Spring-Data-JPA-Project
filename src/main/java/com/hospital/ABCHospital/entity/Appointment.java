@@ -1,5 +1,7 @@
 package com.hospital.ABCHospital.entity;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
@@ -14,8 +16,9 @@ public class Appointment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
-	private Timestamp appointmentTime;
+	private int appointment_id;
+	private Time appointmentTime;
+	private Date dateOfAppointment;
 	private boolean started;
 	private boolean ended;
 	private String reason;
@@ -28,19 +31,19 @@ public class Appointment {
 	@JoinColumn(name = "doctor_id")
 	private Doctor doctor;
 
-	public int getId() {
-		return id;
+	public int getAppointment_id() {
+		return appointment_id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public void setAppointment_id(int appointment_id) {
+		this.appointment_id = appointment_id;
 	}
 
-	public Timestamp getAppointmentTime() {
+	public Time getAppointmentTime() {
 		return appointmentTime;
 	}
 
-	public void setAppointmentTime(Timestamp appointmentTime) {
+	public void setAppointmentTime(Time appointmentTime) {
 		this.appointmentTime = appointmentTime;
 	}
 
@@ -83,10 +86,18 @@ public class Appointment {
 	public void setDoctor(Doctor doctor) {
 		this.doctor = doctor;
 	}
+	
+	public Date getDateOfAppointment() {
+		return dateOfAppointment;
+	}
+
+	public void setDateOfAppointment(Date dateOfAppointment) {
+		this.dateOfAppointment = dateOfAppointment;
+	}
 
 	@Override
 	public String toString() {
-		return "Appointment [id=" + id + ", appointmentTime=" + appointmentTime + ", started=" + started + ", ended="
+		return "Appointment [id=" + appointment_id + ", appointmentTime=" + appointmentTime + ", started=" + started + ", ended="
 				+ ended + ", reason=" + reason + ", patient=" + patient + ", doctor=" + doctor + "]";
 	}
 
