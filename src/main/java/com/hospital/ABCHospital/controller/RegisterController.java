@@ -1,5 +1,8 @@
 package com.hospital.ABCHospital.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -7,15 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.Dto.DoctorDTO;
 import com.hospital.ABCHospital.Dto.PatientDTO;
-import com.hospital.ABCHospital.service.AppointmentService;
+import com.hospital.ABCHospital.exception.DuplicateRecordException;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionMessage;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionStatus;
 import com.hospital.ABCHospital.service.IRegistrationService;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/register")
@@ -28,7 +30,18 @@ public class RegisterController {
 	public ResponseEntity<DoctorDTO> registerDoctor(@RequestBody DoctorDTO doctorDto) {
 		
 		if(doctorDto != null) {
-			DoctorDTO registeredDoctor = service.registerDoctor(doctorDto);
+			DoctorDTO registeredDoctor = null;
+			try {
+				registeredDoctor = service.registerDoctor(doctorDto);
+			} catch (DuplicateRecordException e) {
+				
+				registeredDoctor = new DoctorDTO();
+				
+				ExceptionMessage exp = new ExceptionMessage();
+				exp.setErrorCode(HttpStatus.BAD_REQUEST.value());
+				exp.setErrorMessage(ExceptionStatus.DUPLICATE_DOCTOR.getStatusMessage());
+				registeredDoctor.setExecptionMessage(exp);
+			}
 			return ResponseEntity.status(HttpStatus.CREATED).body(registeredDoctor);
 		}
 		return null;
@@ -37,13 +50,25 @@ public class RegisterController {
 	@PostMapping("/patient")
 	public ResponseEntity<PatientDTO> registerPatient(@RequestBody PatientDTO patientDto){
 		
-		PatientDTO dto = service.registerPatient(patientDto);
-		if(dto != null) {
-			Link link = linkTo(RegisterController.class).withSelfRel();
-			dto.add(link);
-			return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+		PatientDTO dto = null;
+		try {
+			dto = service.registerPatient(patientDto);
+			if(dto != null) {
+				Link linkToSelf = linkTo(methodOn(FetchInformationController.class).getPatientDetailsByPatientId(dto.getId())).withSelfRel();
+				
+				dto.add(linkToSelf);
+			}
+		} catch (DuplicateRecordException e) {
+			
+			dto = new PatientDTO();
+			
+			ExceptionMessage exp = new ExceptionMessage();
+			exp.setErrorCode(HttpStatus.BAD_REQUEST.value());
+			exp.setErrorMessage(ExceptionStatus.DUPLICATE_DOCTOR.getStatusMessage());
+			dto.setExceptionMessage(exp);
 		}
-		return null;
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 	
 }

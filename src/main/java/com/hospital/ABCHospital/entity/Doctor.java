@@ -23,6 +23,9 @@ public class Doctor {
 	private String lastName;
 	private String speciality;
 	private long phoneNumber;
+	
+	@OneToMany(mappedBy = "doctor")
+	private AppointmentStatus appStatus;
 
 	@OneToMany(mappedBy = "doctor")
 	private Set<Appointment> appointments;
@@ -94,11 +97,18 @@ public class Doctor {
 		return patients;
 	}
 
+	public AppointmentStatus getAppStatus() {
+		return appStatus;
+	}
+
+	public void setAppStatus(AppointmentStatus appStatus) {
+		this.appStatus = appStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "Doctor [id=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", speciality=" + speciality + ", phoneNumber=" + phoneNumber + "]";
+				+ ", speciality=" + speciality + ", phoneNumber=" + phoneNumber + ", appStatus=" + appStatus + "]";
 	}
-
 
 }

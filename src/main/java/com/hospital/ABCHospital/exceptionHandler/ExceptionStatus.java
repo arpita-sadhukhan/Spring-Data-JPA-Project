@@ -7,7 +7,8 @@ public enum ExceptionStatus {
 	DUPLICATE_APPOINTMENT(1002, "An appointment of the Patient with the same doctor is already registered"),
 	INCOMPLETE_APPOINTMENT(1003, "Incomplete Request"),
 	DOCTOR_UNREGISTERED(1004, "Requested Doctor is not Registered"),
-	PATIENT_UNREGISTERED(1004, "Requested Patient is not Registered"),;
+	PATIENT_UNREGISTERED(1005, "Requested Patient is not Registered"),
+	BACK_DATE(1006, "Back Dated processes are not supported");
 	
 	
 

@@ -3,6 +3,7 @@ package com.hospital.ABCHospital.Dto;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionMessage;
 
 public class DoctorDTO {
 
@@ -26,6 +27,8 @@ public class DoctorDTO {
 	@NotNull(message = "Speciality must not be null")
 	@JsonProperty("Speciality")
 	private String speciality;
+	
+	private ExceptionMessage execptionMessage;
 	
 	public String getFirstName() {
 		return firstName;
@@ -73,6 +76,20 @@ public class DoctorDTO {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the execptionMessage
+	 */
+	public ExceptionMessage getExecptionMessage() {
+		return execptionMessage;
+	}
+
+	/**
+	 * @param execptionMessage the execptionMessage to set
+	 */
+	public void setExecptionMessage(ExceptionMessage execptionMessage) {
+		this.execptionMessage = execptionMessage;
 	}
 
 }

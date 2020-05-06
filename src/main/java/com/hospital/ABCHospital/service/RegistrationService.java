@@ -30,7 +30,7 @@ public class RegistrationService implements IRegistrationService{
 	PatientRepo patientRepo;
 	
 	@Override
-	public DoctorDTO registerDoctor(DoctorDTO doctorDto) {
+	public DoctorDTO registerDoctor(DoctorDTO doctorDto) throws DuplicateRecordException {
 
 		Doctor docEntity = modelMapper.map(doctorDto, Doctor.class);
 
@@ -48,7 +48,7 @@ public class RegistrationService implements IRegistrationService{
 	}
 
 	@Override
-	public PatientDTO registerPatient(PatientDTO patientDto) {
+	public PatientDTO registerPatient(PatientDTO patientDto) throws DuplicateRecordException {
 
 		Patient patient = modelMapper.map(patientDto, Patient.class);
 		Insurance insurance = modelMapper.map(patientDto.getInsurance(), Insurance.class);

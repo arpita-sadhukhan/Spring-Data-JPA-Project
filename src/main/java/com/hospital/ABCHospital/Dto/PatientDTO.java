@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionMessage;
 
 public class PatientDTO extends RepresentationModel<PatientDTO>{
 
@@ -26,6 +27,8 @@ public class PatientDTO extends RepresentationModel<PatientDTO>{
 	
 	@JsonProperty("Insurance")
 	private InsuranceDTO insurance;
+	
+	private ExceptionMessage exceptionMessage;
 	
 	public Integer getId() {
 		return id;
@@ -62,6 +65,18 @@ public class PatientDTO extends RepresentationModel<PatientDTO>{
 	}
 	public void setInsurance(InsuranceDTO insurance) {
 		this.insurance = insurance;
+	}
+	/**
+	 * @return the exceptionMessage
+	 */
+	public ExceptionMessage getExceptionMessage() {
+		return exceptionMessage;
+	}
+	/**
+	 * @param exceptionMessage the exceptionMessage to set
+	 */
+	public void setExceptionMessage(ExceptionMessage exceptionMessage) {
+		this.exceptionMessage = exceptionMessage;
 	}
 	
 }
