@@ -1,35 +1,26 @@
 package com.hospital.ABCHospital.entity;
 
-import java.sql.Date;
+import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class AppointmentStatus {
 
-	@ManyToOne
-	@JoinColumn(name = "doctor_id")
-	private Doctor doctor;
-	
-	private Date date;
+	@EmbeddedId
+	private AppointmentStatusEmbeddedId id;
+
+	@Column(columnDefinition = "int default 10")
 	private int slotsAvailable;
 
-	public Doctor getDoctor() {
-		return doctor;
+	public AppointmentStatusEmbeddedId getId() {
+		return id;
 	}
 
-	public void setDoctor(Doctor doctor) {
-		this.doctor = doctor;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
+	public void setId(AppointmentStatusEmbeddedId id) {
+		this.id = id;
 	}
 
 	public int getSlotsAvailable() {
@@ -38,6 +29,23 @@ public class AppointmentStatus {
 
 	public void setSlotsAvailable(int slotsAvailable) {
 		this.slotsAvailable = slotsAvailable;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, slotsAvailable);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof AppointmentStatus)) {
+			return false;
+		}
+		AppointmentStatus other = (AppointmentStatus) obj;
+		return Objects.equals(id, other.id) && slotsAvailable == other.slotsAvailable;
 	}
 
 }

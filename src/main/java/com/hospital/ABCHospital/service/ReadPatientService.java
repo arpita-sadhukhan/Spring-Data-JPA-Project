@@ -1,6 +1,6 @@
 package com.hospital.ABCHospital.service;
 
-import java.util.List;
+import java.sql.Date;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.Dto.InsuranceDTO;
 import com.hospital.ABCHospital.Dto.PatientDTO;
+import com.hospital.ABCHospital.entity.Appointment;
 import com.hospital.ABCHospital.entity.Patient;
+import com.hospital.ABCHospital.exception.InvalidDataException;
 import com.hospital.ABCHospital.exception.InvalidUserException;
 import com.hospital.ABCHospital.exceptionHandler.ExceptionStatus;
 import com.hospital.ABCHospital.repository.AppointmentRepo;
@@ -41,10 +43,13 @@ public class ReadPatientService implements IReadPatientService {
 	}
 
 	@Override
-	public List<AppointmentDTO> getPatientAppointmentsByPatientId(Integer patientId) {
-		// TODO Auto-generated method stub
+	public AppointmentDTO getPatientAppointmentsByPatientId(Integer patientId, String date) throws InvalidDataException {
+
+		Date reqDate = Date.valueOf(date);
+		Optional<Appointment> appointment = appRepo.findByPatientIdAndDateOfAppointment(patientId, reqDate);
+		appointment.orElseThrow(() -> new InvalidDataException(ExceptionStatus.NO_APPOINTMENTS_AVAILABLE.getStatusMessage()));
 		
-		return null;
+		return modelMapper.map(appointment.get(), AppointmentDTO.class);
 	}
 
 	

@@ -8,7 +8,9 @@ public enum ExceptionStatus {
 	INCOMPLETE_APPOINTMENT(1003, "Incomplete Request"),
 	DOCTOR_UNREGISTERED(1004, "Requested Doctor is not Registered"),
 	PATIENT_UNREGISTERED(1005, "Requested Patient is not Registered"),
-	BACK_DATE(1006, "Back Dated processes are not supported");
+	BACK_DATE(1006, "Back Dated processes are not supported"),
+	NO_SLOTS_AVAILABLE(1007, "No Appointment slots are available on the requested date for this doctor"),
+	NO_APPOINTMENTS_AVAILABLE(1008, "No Appointment are available on the requested date");
 	
 	
 

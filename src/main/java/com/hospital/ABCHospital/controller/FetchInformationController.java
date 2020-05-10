@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.Dto.PatientDTO;
+import com.hospital.ABCHospital.exception.InvalidDataException;
 import com.hospital.ABCHospital.exception.InvalidUserException;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionMessage;
+import com.hospital.ABCHospital.exceptionHandler.ExceptionStatus;
 import com.hospital.ABCHospital.service.IReadPatientService;
 
 @RestController
@@ -37,9 +40,21 @@ public class FetchInformationController {
 	}
 	
 	@GetMapping("/appointments/patient/{patientId}")
-	public ResponseEntity<List<AppointmentDTO>> getPatientAppointmentsByPatientId(@PathVariable Integer patientId){
+	public ResponseEntity<AppointmentDTO> getPatientAppointmentsByPatientIdAndDate(@PathVariable Integer patientId, @RequestParam String date){
 		
-		List<AppointmentDTO> appointments = patientService.getPatientAppointmentsByPatientId(patientId);
-		return null;
+		AppointmentDTO appointment = null;
+		try {
+			appointment = patientService.getPatientAppointmentsByPatientId(patientId, date);
+			
+		} catch (InvalidDataException e) {
+
+			appointment = new AppointmentDTO();
+
+			ExceptionMessage exp = new ExceptionMessage();
+			exp.setErrorCode(HttpStatus.BAD_REQUEST.value());
+			exp.setErrorMessage(e.getMessage());
+			appointment.setErrorMessage(exp);
+		}
+		return ResponseEntity.accepted().body(appointment);
 	}
 }

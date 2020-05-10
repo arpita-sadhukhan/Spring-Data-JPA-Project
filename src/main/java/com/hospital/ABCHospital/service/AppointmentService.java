@@ -4,9 +4,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hospital.ABCHospital.Dto.AppointmentDTO;
 import com.hospital.ABCHospital.entity.Appointment;
 import com.hospital.ABCHospital.entity.AppointmentStatus;
+import com.hospital.ABCHospital.entity.AppointmentStatusEmbeddedId;
 import com.hospital.ABCHospital.entity.Doctor;
 import com.hospital.ABCHospital.entity.Patient;
 import com.hospital.ABCHospital.exception.DuplicateRecordException;
@@ -23,6 +22,7 @@ import com.hospital.ABCHospital.exception.InvalidDataException;
 import com.hospital.ABCHospital.exception.InvalidUserException;
 import com.hospital.ABCHospital.exceptionHandler.ExceptionStatus;
 import com.hospital.ABCHospital.repository.AppointmentRepo;
+import com.hospital.ABCHospital.repository.AppointmentStatusRepo;
 import com.hospital.ABCHospital.repository.DoctorRepo;
 import com.hospital.ABCHospital.repository.PatientRepo;
 
@@ -41,6 +41,9 @@ public class AppointmentService implements IAppointmentService{
 	@Autowired
 	ModelMapper modelMapper;
 	
+	@Autowired
+	AppointmentStatusRepo appRepo;
+	
 	private final String TO_CREATE = "TO_CREATE";
 	private final String TO_UPDATE = "TO_UPDATE";
 	private final String DUPLICATE = "DUPLICATE";
@@ -49,7 +52,6 @@ public class AppointmentService implements IAppointmentService{
 	@Override
 	public AppointmentDTO createAppointment(AppointmentDTO appDto) throws InvalidUserException, InvalidDataException, DuplicateRecordException {
 
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
 		LocalDate dateOfAppointment = LocalDate.parse(appDto.getDate());
 		if(dateOfAppointment.isBefore(LocalDate.now())) {
 			throw new InvalidDataException(ExceptionStatus.BACK_DATE.getStatusMessage());
@@ -65,9 +67,15 @@ public class AppointmentService implements IAppointmentService{
 				if(appointmentStatus.equals(DUPLICATE)) {
 					throw new DuplicateRecordException(ExceptionStatus.DUPLICATE_APPOINTMENT.getStatusMessage());
 				}else if(appointmentStatus.equals(TO_UPDATE)) {
-					app.setDateOfAppointment(Date.valueOf(appDto.getDate()));
-					Appointment updatedAppointment = repo.save(app);
-					return modelMapper.map(updatedAppointment, AppointmentDTO.class);
+					
+					int slotsAvailable = checkAppointmentSlots(app);
+					if (slotsAvailable > 1) {
+						app.setDateOfAppointment(Date.valueOf(appDto.getDate()));
+						Appointment updatedAppointment = repo.save(app);
+						return modelMapper.map(updatedAppointment, AppointmentDTO.class);
+					}else {
+						throw new InvalidDataException(ExceptionStatus.INCOMPLETE_APPOINTMENT.getStatusMessage());
+					}
 				}
 			}else {
 				return modelMapper.map(createNewAppointment(appDto), AppointmentDTO.class);
@@ -76,6 +84,16 @@ public class AppointmentService implements IAppointmentService{
 			throw new IllegalArgumentException(ExceptionStatus.INCOMPLETE_APPOINTMENT.getStatusMessage());
 		}
 		return null;
+	}
+
+	private int checkAppointmentSlots(Appointment appointment) {
+
+		Optional<AppointmentStatus> appStatus = appRepo.findById(new AppointmentStatusEmbeddedId(appointment.getDoctor().getId(), appointment.getDateOfAppointment()));
+		if(appStatus.isPresent()) {
+			AppointmentStatus status = appStatus.get();
+			return status.getSlotsAvailable();
+		}
+		return 0;
 	}
 
 	private String checkAppointmentStatus(AppointmentDTO appDto, Appointment appointmentHistory) {
@@ -116,9 +134,21 @@ public class AppointmentService implements IAppointmentService{
 	private void updateAppointmentStatus(Appointment newAppointment) {
 
 		
-		AppointmentStatus appStatus = new AppointmentStatus();
-		appStatus.setDoctor(newAppointment.getDoctor());
-		//appStatus
+		Optional<AppointmentStatus> appStatus = appRepo.findById(new AppointmentStatusEmbeddedId(newAppointment.getDoctor().getId(), newAppointment.getDateOfAppointment()));
+		if(appStatus.isPresent()) {
+			AppointmentStatus appointmentStatus = appStatus.get();
+			if(appointmentStatus.getSlotsAvailable() > 1) {
+				appointmentStatus.setSlotsAvailable(appointmentStatus.getSlotsAvailable() - 1);
+				
+				appRepo.save(appointmentStatus);
+			}
+		}else {
+			AppointmentStatus status = new AppointmentStatus();
+			status.setId(new AppointmentStatusEmbeddedId(newAppointment.getDoctor().getId(), newAppointment.getDateOfAppointment()));
+			status.setSlotsAvailable(9);
+			
+			appRepo.save(status);
+		}
 	}
 
 	private Appointment map(AppointmentDTO appDto) throws InvalidUserException {
