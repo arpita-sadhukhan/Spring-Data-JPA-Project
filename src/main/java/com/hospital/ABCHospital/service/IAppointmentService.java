@@ -9,4 +9,6 @@ public interface IAppointmentService {
 
 	AppointmentDTO createAppointment(AppointmentDTO appDto) throws InvalidUserException, InvalidDataException, DuplicateRecordException;
 
+	AppointmentDTO checkIn(AppointmentDTO appDto) throws InvalidDataException;
+
 }

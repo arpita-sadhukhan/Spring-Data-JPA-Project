@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hospital.ABCHospital.Dto.AppointmentDTO;
+import com.hospital.ABCHospital.Dto.PaymentDetails;
 import com.hospital.ABCHospital.entity.Appointment;
 import com.hospital.ABCHospital.entity.AppointmentStatus;
 import com.hospital.ABCHospital.entity.AppointmentStatusEmbeddedId;
 import com.hospital.ABCHospital.entity.Doctor;
 import com.hospital.ABCHospital.entity.Patient;
+import com.hospital.ABCHospital.entity.Payment;
 import com.hospital.ABCHospital.exception.DuplicateRecordException;
 import com.hospital.ABCHospital.exception.InvalidDataException;
 import com.hospital.ABCHospital.exception.InvalidUserException;
@@ -25,6 +27,7 @@ import com.hospital.ABCHospital.repository.AppointmentRepo;
 import com.hospital.ABCHospital.repository.AppointmentStatusRepo;
 import com.hospital.ABCHospital.repository.DoctorRepo;
 import com.hospital.ABCHospital.repository.PatientRepo;
+import com.hospital.ABCHospital.repository.PaymentRepo;
 
 @Service
 public class AppointmentService implements IAppointmentService{
@@ -43,6 +46,9 @@ public class AppointmentService implements IAppointmentService{
 	
 	@Autowired
 	AppointmentStatusRepo appRepo;
+	
+	@Autowired
+	PaymentRepo paymentRepo;
 	
 	private final String TO_CREATE = "TO_CREATE";
 	private final String TO_UPDATE = "TO_UPDATE";
@@ -171,5 +177,54 @@ public class AppointmentService implements IAppointmentService{
 		
 		return appointment;
 	}
+
+	@Override
+	@Transactional
+	public AppointmentDTO checkIn(AppointmentDTO appDto) throws InvalidDataException {
+
+		Appointment appointment = fetchAppointment(appDto.getPatientId(), appDto.getDoctorId(), appDto.getDate());
+		
+		if(appDto.getPaymentDetails() == null)
+			throw new InvalidDataException(ExceptionStatus.PAYMENT_DETAILS_MISSING.getStatusMessage());
+		
+		Payment processedPayment = processPayment(appDto.getPaymentDetails(), appointment);
+		if(processedPayment != null) {
+			appointment.setStarted(true);
+			Appointment updatedAppointment = repo.save(appointment);
+			
+			AppointmentDTO appointmentDTO = modelMapper.map(updatedAppointment, AppointmentDTO.class);
+			PaymentDetails paymentDetails = modelMapper.map(processedPayment, PaymentDetails.class);
+			appointmentDTO.setPaymentDetails(paymentDetails);
+			
+			return appointmentDTO;
+		}
+		return null;
+	}
+
+	private Payment processPayment(PaymentDetails paymentDetails, Appointment appointment) {
+
+		if(paymentDetails != null) {
+			Payment payment = modelMapper.map(paymentDetails, Payment.class);
+			payment.setPatient(appointment.getPatient());
+			
+			if(payment != null) {
+				Payment processedPayment = paymentRepo.save(payment);
+				return processedPayment;
+			}
+		}
+			
+		return null;
+	}
+
+	private Appointment fetchAppointment(int patientId, int doctorId, String date) throws InvalidDataException {
+
+		Optional<Appointment> appointment = repo.findByPatientIdAndDoctorIdAndDateOfAppointment(patientId, doctorId,
+				Date.valueOf(date));
+		appointment.orElseThrow(
+				() -> new InvalidDataException(ExceptionStatus.NO_APPOINTMENTS_AVAILABLE.getStatusMessage()));
+
+		return appointment.get();
+	}
+
 
 }

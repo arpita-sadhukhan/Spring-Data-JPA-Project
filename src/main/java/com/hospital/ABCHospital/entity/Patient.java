@@ -33,6 +33,9 @@ public class Patient {
 	@JoinTable(name = "patients_doctors", joinColumns = @JoinColumn(name = "doctor_id", referencedColumnName = "id"), 
 	inverseJoinColumns = @JoinColumn(name = "patient_id", referencedColumnName = "id"))
 	private Set<Doctor> doctors;
+	
+	@OneToMany(mappedBy = "patient")
+	private Set<Payment> payments;
 
 	public int getId() {
 		return id;
@@ -102,6 +105,18 @@ public class Patient {
 	public String toString() {
 		return "Patient [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", phone=" + phone
 				+ ", providerName=" + providerName + ", appointments=" + appointments + ", doctors=" + doctors + "]";
+	}
+
+	public Set<Payment> getPayment() {
+		return this.payments;
+	}
+
+	public void addPayment(Payment payment) {
+		if(this.payments == null) {
+			this.payments = new HashSet<Payment>();
+		}
+		this.payments.add(payment);
+		payment.setPatient(this);
 	}
 
 }

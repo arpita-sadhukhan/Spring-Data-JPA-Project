@@ -10,7 +10,10 @@ public enum ExceptionStatus {
 	PATIENT_UNREGISTERED(1005, "Requested Patient is not Registered"),
 	BACK_DATE(1006, "Back Dated processes are not supported"),
 	NO_SLOTS_AVAILABLE(1007, "No Appointment slots are available on the requested date for this doctor"),
-	NO_APPOINTMENTS_AVAILABLE(1008, "No Appointment are available on the requested date");
+	NO_APPOINTMENTS_AVAILABLE(1008, "No Appointment are available on the requested date"),
+	MANDATORY_DATA_NOT_AVAILABLE(1009, "Mandatory data is missing"),
+	PAYMENT_DETAILS_MISSING(1010, "Payment Details are missing"),
+	INTERNAL_SERVER_ERROR(1011, "Internal Server Error");
 	
 	
 

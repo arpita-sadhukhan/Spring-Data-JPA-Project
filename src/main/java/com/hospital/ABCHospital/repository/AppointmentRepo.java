@@ -14,4 +14,6 @@ public interface AppointmentRepo extends CrudRepository<Appointment, Integer> {
 	Optional<Appointment> findByPatientIdAndDoctorId(Integer patientId, Integer doctorId);
 
 	Optional<Appointment> findByPatientIdAndDateOfAppointment(Integer patientId, Date reqDate);
+	
+	Optional<Appointment> findByPatientIdAndDoctorIdAndDateOfAppointment(Integer patientId, Integer doctorId, Date reqDate);
 }

@@ -72,9 +72,4 @@ public class RegisterController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 	
-	@GetMapping("/getAppointment")
-	public String get() {
-		return "Hi";
-	}
-	
 }

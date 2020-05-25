@@ -33,6 +33,8 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 	@NotNull(message = "Please provide Doctor Information")
 	@JsonProperty("Doctor Id")
 	private int doctorId;
+	
+	private PaymentDetails paymentDetails;
 
 	private ExceptionMessage errorMessage;
 
@@ -106,6 +108,14 @@ public class AppointmentDTO extends RepresentationModel<AppointmentDTO> {
 
 	public void setErrorMessage(ExceptionMessage errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+
+	public PaymentDetails getPaymentDetails() {
+		return paymentDetails;
+	}
+
+	public void setPaymentDetails(PaymentDetails paymentDetails) {
+		this.paymentDetails = paymentDetails;
 	}
 
 }
